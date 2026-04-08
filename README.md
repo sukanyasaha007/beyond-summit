@@ -6,7 +6,7 @@ Quick-reference materials for **Beyond Summit 2026** (April 8, 2026, San Francis
 
 ## Quick Start
 
-1. **Start here:** [prep_notes_v2.md](prep_notes_v2.md)
+1. **Start here:** [prep_notes.md](prep_notes.md)
    - Key talking points, all 20+ speakers with 1-2 line backgrounds, targeted questions for each
    - GPU comparison table
    - Elevator pitch and logistics checklist
@@ -26,7 +26,7 @@ Quick-reference materials for **Beyond Summit 2026** (April 8, 2026, San Francis
 
 | File | Purpose | When to Use |
 |------|---------|------------|
-| **prep_notes_v2.md** | Main quick reference. Key themes, all speakers, questions, logistics | Scan 10 mins before the event; bring to the event for quick lookups |
+| **prep_notes.md** | Main quick reference. Key themes, all speakers, questions, logistics | Scan 10 mins before the event; bring to the event for quick lookups |
 | **amd_gpus_&_rocm.md** | AMD GPU specs, ROCm software stack, library gaps, where AMD wins/loses, portability paths | When speakers discuss MI355X, ROCm maturity, RCCL scale, or you want to ask differentiated questions |
 | **nvidia_gpus_&_cuda.md** | CUDA architecture (programming model, compiler, libraries), NVIDIA lineup, why CUDA lock-in is sticky, "beyond CUDA" solutions | When speakers discuss ZLUDA, SCALE, Triton, Modular, or why switching from CUDA is hard |
 | **inference_vllm_sglang.md** | vLLM vs. SGLang comparison, KV cache strategies, speculative decoding, quantization (FP8/GPTQ/AWQ), inference metrics, AMD vs. NVIDIA | When talks focus on LLM serving, TensorWave's ScalarLM, or inference workloads |
@@ -85,7 +85,7 @@ Key terms appear in speaker questions with `[J]` markers. Definitions are in the
 
 ## Before the Event
 
-- [ ] Skim [prep_notes_v2.md](prep_notes_v2.md) (10 mins)
+- [ ] Skim [prep_notes.md](prep_notes.md) (10 mins)
 - [ ] Run [llm_finetune_colab.ipynb](llm_finetune_colab.ipynb) on Google Colab (30 mins) to get hands-on feel for fine-tuning and quantization
 - [ ] Charge devices, bring portable charger
 - [ ] Business cards / LinkedIn QR code for contact sharing

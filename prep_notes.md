@@ -1,358 +1,334 @@
-# Beyond Summit 2026 -- Preparation Notes
+# Beyond Summit 2026 -- Quick Prep
 
-**Date:** April 8, 2026 | 8:30 AM - 7:30 PM  
-**Location:** San Francisco, CA (check registration for exact address)
-
----
-
-## Key Themes to Track
-
-### 1. ROCm Ecosystem Maturity
-- ROCm is AMD's answer to CUDA. Track how close the developer experience is to CUDA parity.
-- Questions to ask speakers:
-  - What are the remaining sharp edges when porting CUDA kernels to HIP?
-  - How stable is ROCm across driver versions in production?
-  - What is the state of flash-attention on MI300X/MI355X?
-
-### 2. MI355X Performance Tuning
-- AMD Instinct MI355X is the latest generation. Understand memory bandwidth, HBM capacity, and how it compares to H100/B200.
-- Questions:
-  - What batch sizes and sequence lengths show the best throughput on MI355X?
-  - How does the memory hierarchy differ in practice vs. NVIDIA Hopper/Blackwell?
-  - What profiling tools are mature enough for production use (rocprof, omniperf)?
-
-### 3. Multi-GPU / Distributed Training
-- RCCL (AMD's NCCL equivalent) maturity.
-- Topology-aware placement on AMD GPU clusters.
-- Questions:
-  - What interconnect (Infinity Fabric, PCIe, RoCE) configurations are teams using?
-  - How does RCCL collective performance compare to NCCL at scale (256+ GPUs)?
-
-### 4. Inference Stack: vLLM, TensorRT-LLM alternatives
-- vLLM on ROCm is a major talking point. Understand current throughput/latency numbers.
-- Questions:
-  - What quantization formats (GPTQ, AWQ, FP8) work best on MI355X?
-  - What is the state of speculative decoding on AMD hardware?
-  - How does continuous batching perform under real production load?
-
-### 5. Portability (PyTorch, JAX, vLLM)
-- PyTorch has first-class ROCm support. JAX support is less mature.
-- Questions:
-  - What is the JAX-on-ROCm story for training? Is XLA fully functional?
-  - Are there framework-level abstractions that make GPU-agnostic code realistic?
-
-### 6. Cost / TCO
-- AMD GPUs often have better price-performance on paper. Get real numbers.
-- Questions:
-  - What is the all-in TCO (power, cooling, software eng overhead) vs. NVIDIA?
-  - How do cloud pricing models compare (TensorWave, CoreWeave, Lambda)?
+**Date:** April 8, 2026 | 8:30 AM - 7:30 PM | San Francisco, CA
 
 ---
 
-## EDA Jargon Cheat Sheet
+## 1. Key Points to Review
 
-- **Coverage closure** = getting your test suite to hit all the design scenarios you defined as goals before the chip goes to manufacturing. Think of it as filling a checklist -- every box must be ticked.
-- **RTL** = Register Transfer Level. The Verilog/VHDL code that describes what a chip does. It is the "source code" of hardware.
-- **DUT** = Design Under Test. The chip block you are verifying.
-- **Regression** = re-running all tests after a code change to make sure nothing broke.
-- **Formal verification** = proving a design property is always true mathematically, without running simulations.
-- **State space** = all possible combinations of inputs and internal states a chip can be in. For real chips, this is astronomically large.
-- **Dogfooding** = a company using its own product internally.
+- This is an **AMD / ROCm** event. The entire narrative is "the world beyond CUDA." Almost every speaker is either building on AMD GPUs, enabling portability away from NVIDIA, or analyzing the shift.
+- **MI355X** (CDNA4) is AMD's newest GPU -- 288 GB HBM3e, ~4,600 FP8 TFLOPS, ~750W. Expect it to dominate the conversation.
+- **TensorWave** is the host. They sell AMD GPU cloud (bare metal, inference, training). Their inference engine is **ScalarLM**.
+- The key software battle: **ROCm** vs. **CUDA**. ROCm is open-source but less mature. Track where the gaps are closing and where they are not.
+- **Inference** is AMD's strongest story: more HBM = bigger models in memory, high bandwidth = faster token generation. Training at scale (256+ GPUs) is still NVIDIA's territory because of **NVLink/NVSwitch** interconnect advantages.
+- **Cost/TCO** is AMD's second strongest argument: 30-50% cheaper per GPU-hour, lower TDP (power draw).
+- **NVIDIA has EDA-specific AI** (ChipNeMo, VerilogEval). **AMD has none.** AMD sees itself as a compute platform, not an EDA AI player. Good angle to probe.
+- **Portability approaches** to watch: ZLUDA (runtime CUDA-on-AMD), SCALE/Spectral Compute (compile-time CUDA-on-AMD), Triton (hardware-agnostic kernels), Modular/Mojo (new compiler).
+- **Ashish Vaswani** (Essential AI CEO) is here -- he is the lead author of the transformer paper. The biggest name at the event.
+- **Dylan Patel** (SemiAnalysis) is the go-to analyst for GPU economics. His cost/supply chain data is widely cited.
+
+### GPU Comparison at a Glance
+
+| Spec | NVIDIA H100 | NVIDIA B200 | AMD MI300X | AMD MI325X | AMD MI355X |
+|------|------------|------------|-----------|-----------|-----------|
+| **HBM** | 80 GB | 192 GB | 192 GB | 256 GB | 288 GB |
+| **Bandwidth** | 3.35 TB/s | 8.0 TB/s | 5.3 TB/s | 6.0 TB/s | 6.0+ TB/s |
+| **FP8 TFLOPS** | 1,979 | ~4,500 | 2,615 | 2,615 | ~4,600 |
+| **TDP** | 700W | 1,000W | 750W | 750W | ~750W |
+| **Interconnect** | NVLink | NVLink 5 | Infinity Fabric | Infinity Fabric | Infinity Fabric |
+
+**AMD wins:** Memory capacity, price-per-TFLOPS, power efficiency, open-source stack.
+**NVIDIA wins:** Software ecosystem (15 yrs of CUDA), interconnect at scale, compiler/profiler maturity.
 
 ---
 
-## Verilog/EDA AI Benchmarks: NVIDIA vs. AMD
+## 2. Jargon & Deep Dives -- Separate Review Notes
 
-**NVIDIA has EDA-specific AI benchmarks. AMD has none.**
+Detailed jargon, GPU specs, and domain reviews are in dedicated files for focused study:
 
-| Benchmark | Source | What it is |
-|-----------|--------|-----------|
-| **VerilogEval v1/v2** | NVlabs | 156 Verilog problems with testbenches. Code-completion + spec-to-RTL. Industry standard. (`github.com/NVlabs/verilog-eval`) |
-| **VGen** | NYU | Fine-tuned CodeGen on Verilog. Uses `shailja/Verilog_GitHub` dataset (109k modules). (`github.com/shailja-thakur/VGen`) |
-| **ChipNeMo** | NVIDIA | Internal model fine-tuned on proprietary chip design data. Paper only, not open-sourced. |
+- **[amd_gpus_&_rocm.md](amd_gpus_&_rocm.md)** -- AMD GPU lineup (MI300X/MI325X/MI355X), ROCm stack, library mapping, portability paths, where AMD wins/loses
+- **[nvidia_gpus_&_cuda.md](nvidia_gpus_&_cuda.md)** -- CUDA architecture (programming model, compiler, libraries), NVIDIA GPU lineup, execution model, memory hierarchy, why CUDA lock-in is sticky
+- **[inference_vllm_sglang.md](inference_vllm_sglang.md)** -- vLLM vs. SGLang vs. ScalarLM, KV cache, continuous batching, speculative decoding, quantization (FP8/GPTQ/AWQ), inference metrics
+- **[eda_review.md](eda_review.md)** -- EDA jargon, VerilogEval/ChipNeMo/VGen benchmarks, AMD vs. NVIDIA in EDA AI, angles to probe
 
-AMD has zero public EDA/Verilog benchmarks or models. Their strategy is to be a compute platform, leaving EDA AI to the EDA vendors.
+Jargon terms are marked with `[J]` in the speaker questions below. If you see one you do not recognize, check the relevant review note above.
 
 ---
 
-## Companies & Speakers -- What to Ask Each
+## 3. Speakers & Questions
 
-### TensorWave (Host / AMD GPU Cloud Provider)
-**Speakers:** Darrick Horton (CEO), Jeff Tatarchuk (CGO), Piotr Tomasik (President), Greg Diamos (ScalarLM Architect), Ilya Tabakh (VP Innovation)
-**What they do:** AMD GPU cloud -- bare metal, inference, training. MI300X/MI325X/MI355X.
+### TensorWave -- AMD GPU Cloud Provider (Host)
+
+**Darrick Horton** (CEO) -- Founded TensorWave to build AMD-native GPU cloud. Bet the company on MI300X when everyone else was chasing NVIDIA allocations.
+**Jeff Tatarchuk** (CGO) -- Handles go-to-market and partnerships.
+**Piotr Tomasik** (President) -- Operations and infrastructure.
+**Greg Diamos** (ScalarLM Architect) -- Previously at NVIDIA and Baidu. Built ScalarLM, TensorWave's inference engine.
+**Ilya Tabakh** (VP Innovation) -- R&D and new product development.
+
 **Questions:**
-- How long does it take a team to move from NVIDIA cloud to TensorWave?
-- How does ScalarLM compare to vLLM on AMD?
-- When is MI355X available and what does it cost vs. MI300X?
-- Is TensorWave worth it for smaller workloads like embeddings and RAG, or only big training jobs?
-- What comes pre-installed on a fresh node? ROCm version, containers, drivers?
-- What is the best serving stack for mixed workloads (embeddings + LLM generation) on AMD?
-- **(EDA angle)** Has anyone used your clusters for EDA AI -- like fine-tuning on Verilog code?
+- How long does a team take to migrate from NVIDIA cloud to TensorWave?
+- How does **ScalarLM** `[J]` compare to **vLLM** `[J]` on AMD in throughput and latency?
+- When is **MI355X** `[J]` available on TensorWave, and what does it cost vs. MI300X?
+- Is TensorWave worth it for smaller workloads (embeddings, RAG) or only large training jobs?
+- What comes pre-installed on a fresh node? **ROCm** `[J]` version, containers, drivers?
+- What is the best serving stack for mixed workloads (embeddings + LLM generation)?
+- (EDA) Has anyone used your clusters for EDA AI -- fine-tuning on Verilog code or running **VerilogEval** `[J]`?
 
-### AMD (GPU Manufacturer)
-**Speakers:** Anush Elangovan (VP AI Software), Neha Prakriya (GenAI Training at Scale)
-**What they do:** ROCm software stack, Instinct GPU hardware, MI355X.
+---
+
+### AMD -- GPU Manufacturer
+
+**Anush Elangovan** (VP AI Software) -- Leads the ROCm software ecosystem team. Responsible for closing the gap with CUDA.
+**Neha Prakriya** (GenAI Training at Scale) -- Focuses on large-scale model training on Instinct GPUs.
+
 **Questions:**
-- What is coming next for ROCm? Which CUDA gaps are being closed?
-- How ready is FP8 on MI355X for real training and inference?
-- Is AMD backing Triton or building their own compiler?
-- Is AMD looking at GPU acceleration for EDA (simulation, verification)?
-- Flash-attention on MI355X -- native or community port? How fast vs. NVIDIA?
-- How do embedding model workloads (smaller models, high throughput) perform on MI355X vs. LLM inference?
-- What is the state of ROCm support for smaller, specialized models (not just LLMs) that could run inference in EDA pipelines?
-- NVIDIA invested in ChipNeMo and VerilogEval. Is AMD planning EDA-specific AI, or leaving it to EDA vendors building on ROCm?
-- **(Indirect EDA probe)** Does AMD's own chip design team run ML training on Instinct GPUs with ROCm?
-- **(Indirect EDA probe)** Coverage closure at AMD's scale must be a massive problem. How does the verification team handle that?
-- **(Competitive framing)** NVIDIA published ChipNeMo for chip design AI. Has AMD done something similar?
-- **(Best for Neha)** When AMD trains models internally, do you use your own MI300X clusters or still depend on NVIDIA?
-- **Tip:** Talk to AMD engineers in the audience at networking, not just the VPs on stage.
+- What is next for **ROCm** `[J]`? Which CUDA gaps are being closed in 2026?
+- How production-ready is **FP8** `[J]` on **MI355X** `[J]` for training and inference?
+- Is AMD investing in **Triton** `[J]` or building a proprietary compiler?
+- **Flash-attention** `[J]` on MI355X -- native or community port? Benchmarks vs. NVIDIA?
+- How do embedding model workloads (high throughput, small models) perform on MI355X vs. LLM inference?
+- What is the state of **ROCm** `[J]` support for smaller, specialized models that could run inference in EDA pipelines?
+- NVIDIA published **ChipNeMo** `[J]` and **VerilogEval** `[J]` for chip design AI. Is AMD planning EDA-specific AI, or leaving it to EDA vendors on ROCm?
+- (Indirect EDA) Does AMD's own chip design team run ML training on Instinct GPUs with ROCm? (**Dogfooding** `[J]`)
+- (Indirect EDA) **Coverage closure** `[J]` at AMD's scale is massive. How does the verification team handle it?
+- (For Neha) When AMD trains models internally, do you use MI300X clusters or still depend on NVIDIA?
+- *Tip:* Talk to AMD engineers in the audience at networking, not just the VPs on stage.
 
-### Essential AI
-**Speaker:** Ashish Vaswani (CEO) -- lead author of the original transformer paper ("Attention Is All You Need").
-**What they do:** Enterprise AI products.
+---
+
+### Essential AI -- Enterprise AI
+
+**Ashish Vaswani** (CEO) -- Lead author of "Attention Is All You Need," the original transformer paper. Co-invented the architecture that powers every modern LLM.
+
 **Questions:**
 - What comes after transformers? What architectures are gaining real traction?
-- Does Essential AI build for AMD GPUs too, or just NVIDIA?
-- What do hybrid architectures (transformers + state-space models) look like in practice?
+- Does Essential AI target AMD GPUs, or only NVIDIA?
+- What do hybrid architectures (transformers + state-space models) look like in production?
 
-### SemiAnalysis
-**Speaker:** Dylan Patel (Founder)
-**What they do:** Semiconductor and AI analysis. The go-to source for GPU economics and supply chain data.
+---
+
+### SemiAnalysis -- Semiconductor & AI Analysis
+
+**Dylan Patel** (Founder) -- The most-cited independent analyst for GPU economics, supply chain, and chip strategy. His reports move markets.
+
 **Questions:**
-- What are the real cost numbers for AMD vs. NVIDIA at scale?
+- What are the real **TCO** `[J]` numbers for AMD vs. NVIDIA at scale?
 - Where does AMD win (memory, price) and where does it still lose (software, compilers)?
-- Is AMD GPU capacity actually easier to get than NVIDIA right now?
-- How do custom chips (Google TPU, AWS Trainium) compare to AMD and NVIDIA?
+- Is AMD GPU capacity actually easier to procure than NVIDIA right now?
+- How do custom chips (Google TPU, AWS Trainium) compare to AMD and NVIDIA on TCO?
 
-### Liquid AI
-**Speaker:** Mathias Lechner (CTO) -- MIT spin-off.
-**What they do:** Non-transformer architectures (liquid neural networks, state-space models).
-**Questions:**
-- Do liquid networks run well on AMD GPUs?
-- Are they more memory-efficient for long documents?
-- Can these models run on standard serving tools like vLLM?
-- Could liquid networks be better than transformers for reading long chip specs?
+---
 
-### ZLUDA
-**Speaker:** Andrzej Janik (Founder)
-**What they do:** Run CUDA programs on AMD GPUs without changing code. Drop-in compatibility layer.
+### Liquid AI -- Non-Transformer Architectures
+
+**Mathias Lechner** (CTO) -- MIT spin-off. Researches liquid neural networks and state-space models as alternatives to transformers.
+
 **Questions:**
-- What percentage of CUDA apps work through ZLUDA today?
-- How much slower is it vs. native ROCm?
+- Do liquid networks run well on AMD GPUs with **ROCm** `[J]`?
+- Are they more memory-efficient for long documents (relevant to reading chip specs)?
+- Can these models run on standard serving tools like **vLLM** `[J]`?
+- Could liquid networks be better than transformers for ingesting long **RTL** `[J]` specs?
+
+---
+
+### ZLUDA -- CUDA-on-AMD Runtime
+
+**Andrzej Janik** (Founder) -- Built **ZLUDA** `[J]`, a drop-in binary compatibility layer that runs CUDA programs on AMD GPUs without recompilation.
+
+**Questions:**
+- What percentage of CUDA applications work through **ZLUDA** `[J]` today?
+- How much slower is it vs. native **ROCm** `[J]` / **HIP** `[J]`?
 - Is it production-ready or still experimental?
-- Is ZLUDA a real migration path or just for prototyping?
+- Is ZLUDA a real migration path, or only for prototyping before a full **HIP** `[J]` port?
 
-### Modular
-**Speaker:** Mostafa Hagog (VP Engineering)
-**What they do:** Mojo language and Modular inference engine. Write code once, run on any GPU.
+---
+
+### Modular -- Mojo Language & Inference Engine
+
+**Mostafa Hagog** (VP Engineering) -- Building Mojo, a new systems language that targets multiple GPU backends from a single codebase.
+
 **Questions:**
-- How does Modular compare to Triton for targeting AMD GPUs?
-- Is anyone actually using Mojo for custom GPU kernels?
-- Can Modular run the same code on NVIDIA and AMD with zero changes?
+- How does Modular compare to **Triton** `[J]` for writing GPU kernels that target AMD?
+- Is anyone using Mojo for production custom kernels yet?
+- Can Modular run identical code on NVIDIA and AMD with zero changes?
 - Where does Modular beat stock PyTorch the most?
 
-### Zyphra
-**Speaker:** Quentin Anthony (VP Engineering)
-**What they do:** Efficient language models (Zamba series). Smaller models that compete with bigger ones.
+---
+
+### Zyphra -- Efficient Language Models
+
+**Quentin Anthony** (VP Engineering) -- Builds the Zamba series: smaller, efficient models (often **MoE** `[J]`) that compete with larger ones.
+
 **Questions:**
 - How was the experience training on AMD? What broke?
-- Do efficient architectures (MoE, hybrid) benefit from AMD's larger memory?
-- Which training framework works best on AMD -- DeepSpeed, FSDP, or Megatron?
+- Do **MoE** `[J]` and hybrid architectures benefit from AMD's larger **HBM** `[J]`?
+- Which distributed training framework works best on AMD -- DeepSpeed, FSDP, or Megatron? How is **RCCL** `[J]` performing?
 
-### Spectral Compute
-**Speaker:** Michael Sondergaard (CEO)
-**What they do:** SCALE -- compiles CUDA code to run on AMD at build time. Different from ZLUDA (which does it at runtime).
-**Questions:**
-- How does SCALE differ from ZLUDA in practice?
-- How fast is SCALE-compiled code vs. native ROCm?
-- Which CUDA libraries does it cover?
-- Is SCALE free or paid?
+---
 
-### Artificial Analysis
-**Speaker:** Micah Hill-Smith (CEO)
-**What they do:** Independent benchmarking of AI models and inference providers. Publishes leaderboards.
+### Spectral Compute -- SCALE (Compile-Time CUDA→AMD)
+
+**Michael Sondergaard** (CEO) -- Built **SCALE** `[J]`, which recompiles CUDA source code to AMD GPU targets at build time. Compile-time alternative to ZLUDA's runtime approach.
+
 **Questions:**
-- How does AMD-based inference rank against NVIDIA-based providers?
-- What matters most for inference in production -- first token speed, tokens/sec, or tail latency?
+- How does **SCALE** `[J]` differ from **ZLUDA** `[J]` in practice? When would you use one vs. the other?
+- How fast is SCALE-compiled code vs. native **ROCm** `[J]` / **HIP** `[J]`?
+- Which CUDA libraries does it cover (cuDNN, cuBLAS, etc.)?
+- Is SCALE free or commercial?
+
+---
+
+### Artificial Analysis -- Independent AI Benchmarking
+
+**Micah Hill-Smith** (CEO) -- Publishes independent leaderboards ranking AI models and inference providers on speed, cost, and quality.
+
+**Questions:**
+- How does AMD-based inference rank vs. NVIDIA-based providers in your benchmarks?
+- What metric matters most for production inference -- time-to-first-token, tokens/sec, or tail latency?
 - Are AMD providers catching up in the rankings?
 
-### Featherless AI
-**Speaker:** Eugene Cheah (CEO)
-**What they do:** Serverless model inference. Deploy any HuggingFace model without managing servers.
-**Questions:**
-- How stable is ROCm for running many different model architectures?
-- How do you handle less popular models on AMD hardware?
-- What quantization works best on AMD for serverless?
+---
 
-### dstack
-**Speaker:** Marc Fleury (Co-Founder)
-**What they do:** Open-source tool to manage GPU jobs across multiple clouds.
+### Featherless AI -- Serverless Model Inference
+
+**Eugene Cheah** (CEO) -- Deploy any HuggingFace model as a serverless endpoint without managing infrastructure.
+
+**Questions:**
+- How stable is **ROCm** `[J]` for running many different model architectures?
+- What **quantization** `[J]` formats work best on AMD for serverless workloads?
+- How do you handle less popular models on AMD hardware?
+
+---
+
+### dstack -- Multi-Cloud GPU Orchestration
+
+**Marc Fleury** (Co-Founder) -- Open-source tool for managing GPU compute jobs across multiple cloud providers.
+
 **Questions:**
 - Does dstack support AMD GPUs and TensorWave?
-- How easy is it to switch a job from NVIDIA to AMD in dstack?
-- How does dstack compare to other GPU job orchestration tools?
+- How easy is it to move a job from NVIDIA to AMD in dstack?
+- How does dstack compare to other GPU job orchestrators (SkyPilot, etc.)?
 
-### RedHat
-**Speaker:** Ron Haberman (AI Incubation)
-**What they do:** Enterprise Linux, OpenShift (Kubernetes), AI platform tooling.
+---
+
+### Red Hat -- Enterprise Linux & Kubernetes AI
+
+**Ron Haberman** (AI Incubation) -- Working on AI platform tooling within Red Hat's OpenShift (Kubernetes) ecosystem.
+
 **Questions:**
 - Does OpenShift AI support AMD GPUs well?
-- How mature are AMD GPU plugins for Kubernetes?
-- Are real enterprise customers running AMD GPU workloads on OpenShift?
+- How mature are AMD GPU device plugins for Kubernetes?
+- Are enterprise customers actually running AMD GPU workloads on OpenShift in production?
 
-### MLPerf
-**Speaker:** David Kanter (Founder)
-**What they do:** Industry-standard AI benchmarks. Hardware-neutral.
+---
+
+### MLPerf -- Industry AI Benchmarks
+
+**David Kanter** (Founder) -- Created **MLPerf** `[J]`, the industry-standard hardware-neutral AI benchmark suite. The "SPEC" of AI hardware.
+
 **Questions:**
-- How are AMD GPUs doing in recent MLPerf results vs. NVIDIA and Google TPU?
-- Where does AMD score best and worst in MLPerf?
+- How are AMD GPUs doing in recent **MLPerf** `[J]` results vs. NVIDIA and Google TPU?
+- Where does AMD score best and worst?
 - Are more companies submitting AMD results, or is it still mostly NVIDIA?
 
-### Credo (Sponsor + Speaker)
-**Speaker:** Bill Brennan (CEO)
-**What they do:** High-speed cables and interconnects for GPU clusters.
-**Questions:**
-- What bandwidth do MI355X clusters need?
-- How does Credo compare to NVIDIA's NVLink for GPU-to-GPU communication?
+---
 
-### Sanmina
-**Speaker:** Casey Cerretani (CTO)
-**What they do:** Builds the physical servers and racks that GPUs go into.
+### Credo -- GPU Cluster Interconnects (Sponsor)
+
+**Bill Brennan** (CEO) -- Makes high-speed cables and optical interconnects for GPU clusters. The physical layer that connects GPUs across racks.
+
+**Questions:**
+- What bandwidth do **MI355X** `[J]` clusters need from interconnects?
+- How does Credo compare to **NVLink** `[J]` for GPU-to-GPU communication at rack scale?
+- At what cluster scale does **Infinity Fabric** `[J]`'s bandwidth gap vs. NVLink materially hurt training?
+
+---
+
+### Sanmina -- Server & Rack Manufacturing
+
+**Casey Cerretani** (CTO) -- Builds the physical servers and racks that GPUs go into. System-level thermal and power engineering.
+
 **Questions:**
 - What are the cooling and power challenges for AMD GPU racks vs. NVIDIA?
-- How does liquid cooling differ between AMD and NVIDIA systems?
+- How does liquid cooling differ between AMD and NVIDIA server designs?
 
-### PG&E
-**Speaker:** Jon Stallman (Utility Partnerships & Innovation)
-**What they do:** The power company for Northern California.
+---
+
+### PG&E -- Power Utility
+
+**Jon Stallman** (Utility Partnerships & Innovation) -- From the power company that supplies Northern California. Here because AI datacenters are driving massive power demand.
+
 **Questions:**
 - How much power are AI datacenters demanding in the Bay Area?
 - How are utilities planning for megawatt-scale GPU clusters?
+- Does the **TDP** `[J]` difference (750W AMD vs. 1,000W NVIDIA) matter at datacenter scale?
 
-### AT&T
-**Speaker:** Farbod Tavakkoli (Data Scientist)
-**What they do:** Telecom. Uses AI/ML for network operations.
+---
+
+### AT&T -- Enterprise AI User
+
+**Farbod Tavakkoli** (Data Scientist) -- Uses AI/ML for telecom network operations at AT&T.
+
 **Questions:**
 - What AI workloads is AT&T running on AMD GPUs?
-- How does a big enterprise decide between AMD and NVIDIA?
+- How does a large enterprise evaluate AMD vs. NVIDIA for production?
 
-### Wafer AI
-**Speaker:** Emilio Andere (CEO)
-**What they do:** Wafer-scale AI chips (entire chip on one wafer, like Cerebras).
+---
+
+### Wafer AI -- Wafer-Scale AI Chips
+
+**Emilio Andere** (CEO) -- Building wafer-scale AI chips (entire chip on one silicon wafer, like Cerebras). Alternative to discrete GPUs.
+
 **Questions:**
 - Where does wafer-scale compute fit alongside GPUs?
 - What workloads suit wafer-scale better than discrete GPUs?
 
-### Quixi AI / Cognitive Computations
-**Speaker:** Eric Hartford (Founder)
-**What they do:** Open-source fine-tuning leader. Known for "dolphin" and "samantha" models.
+---
+
+### Quixi AI / Cognitive Computations -- Open-Source Fine-Tuning
+
+**Eric Hartford** (Founder) -- Open-source fine-tuning leader. Known for "dolphin" and "samantha" model families. Prolific in the HuggingFace community.
+
 **Questions:**
-- How is fine-tuning large models on AMD GPUs in practice?
-- Which fine-tuning tool works best on ROCm -- Axolotl, LLaMA-Factory, or PEFT?
+- How is fine-tuning large models on AMD GPUs with **ROCm** `[J]` in practice?
+- Which fine-tuning tool works best on AMD -- Axolotl, LLaMA-Factory, or PEFT?
 - What are the biggest pain points for the open-source community on AMD?
-- **(EDA angle)** Has anyone tried running VerilogEval (Verilog code generation benchmark) on AMD GPUs?
+- (EDA) Has anyone tried running **VerilogEval** `[J]` (Verilog code generation benchmark) on AMD hardware?
+
+---
 
 ### Silares
-**Speaker:** Akhil Sharma (CEO)
-**Questions:**
-- What does Silares do in the AI infrastructure space?
+
+**Akhil Sharma** (CEO) -- Limited public info. Ask what Silares does in AI infrastructure.
+
+---
 
 ### Lumerian Labs
-**Speaker:** Jay Dawani (CEO)
-**Questions:**
-- What is Lumerian Labs building and how does it connect to AMD/open infrastructure?
+
+**Jay Dawani** (CEO) -- Limited public info. Ask what Lumerian Labs is building and how it connects to AMD/open infrastructure.
 
 ---
 
 ### Event Sponsors
-| Sponsor | What They Do |
-|---------|-------------|
-| **AMD** | GPU manufacturer, ROCm stack |
-| **ZT Systems** | AI/HPC server design and manufacturing (acquired by AMD in 2024) |
-| **Credo** | High-speed interconnects for AI clusters |
-| **EdgeCore** | AI datacenter infrastructure |
+
+| Sponsor | Role |
+|---------|------|
+| AMD | GPU manufacturer, ROCm stack |
+| ZT Systems | AI/HPC server design (acquired by AMD in 2024) |
+| Credo | High-speed interconnects |
+| EdgeCore | AI datacenter infrastructure |
 
 ---
 
-## Networking Strategy
+## 4. Elevator Pitch
 
-### Your Elevator Pitch
 "I work on AI-powered verification tooling for chip design -- using LLMs and RAG to help engineers navigate specifications and coverage data. I am here to understand how AMD's compute stack is maturing for production AI workloads."
 
 ---
 
-## Logistics Checklist
+## 5. Logistics
 
-- [ ] Confirm registration approval
+- [ ] Confirm registration
 - [ ] Charge devices, bring portable charger
-- [ ] Business cards or contact-sharing method (LinkedIn QR code)
+- [ ] LinkedIn QR code for contact sharing
 - [ ] Notebook for session notes
-- [ ] Review the speaker/session schedule when published
-- [ ] Download any workshop prerequisites (ROCm SDK, Docker images) if hands-on sessions require it
+- [ ] Review session schedule when published
+- [ ] Breakfast, lunch, snacks, and evening bites are provided
 
 ---
 
-## Quick Reference: AMD vs. NVIDIA GPU Comparison
+## 6. Post-Event
 
-| Spec | NVIDIA H100 | NVIDIA B200 | AMD MI300X | AMD MI325X | AMD MI355X |
-|------|------------|------------|-----------|-----------|-----------|
-| **Architecture** | Hopper | Blackwell | CDNA3 | CDNA3 | CDNA4 |
-| **HBM** | 80 GB HBM3 | 192 GB HBM3e | 192 GB HBM3 | 256 GB HBM3e | 288 GB HBM3e |
-| **Bandwidth** | 3.35 TB/s | 8.0 TB/s | 5.3 TB/s | 6.0 TB/s | 6.0+ TB/s |
-| **FP16 TFLOPS** | 989 | ~2,250 | 1,307 | 1,307 | ~2,300 (est.) |
-| **FP8 TFLOPS** | 1,979 | ~4,500 | 2,615 | 2,615 | ~4,600 (est.) |
-| **TDP** | 700W | 1,000W | 750W | 750W | ~750W |
-| **Interconnect** | NVLink | NVLink 5 | Infinity Fabric | Infinity Fabric | Infinity Fabric |
-
-**Where AMD wins:** Memory capacity (288 GB unmatched), price-performance (30-50% cheaper per GPU-hour), open-source stack (ROCm is fully open).  
-**Where NVIDIA wins:** Software ecosystem (15+ years of CUDA), interconnect at 1000+ GPU scale (NVLink/NVSwitch), compiler/profiling maturity, ecosystem lock-in.
-
----
-
-## Quick Reference: What the GPU Specs Actually Mean
-
-**Bandwidth (TB/s)** -- How fast the GPU reads/writes data from its own HBM memory. Like the bus width between a chip's memory controller and SRAM. LLM inference is memory-bandwidth-bound: the bottleneck is feeding weights to compute cores, not the math. Higher bandwidth = faster inference. During inference, the GPU reads the entire model's weights from memory for every token it generates. The speed limit is how fast it can read, not how fast it can compute. MI300X moves data ~1.6x faster than H100.
-
-**FP16 / FP8 TFLOPS** -- Raw compute throughput: trillions of multiply-add operations per second. FP16 (16-bit) is standard for inference. FP8 (8-bit) packs 2x more ops -- used for quantized training/inference with slight accuracy tradeoff. MI355X's native FP8 is a key summit talking point.
-
-**TDP (Watts)** -- Max power draw. 700W+ requires liquid cooling. A rack of 8 GPUs at 750W = 6 kW just for GPUs. B200 at 1,000W vs. MI355X at ~750W means AMD delivers similar TFLOPS at 25% less power -- real operational cost advantage. (This is why PG&E has a speaker.)
-
-**Interconnect** -- How GPUs communicate within/across servers (like NoC connecting cores in a multi-core SoC).
-- *NVLink (NVIDIA):* Proprietary, 1.8 TB/s per GPU on NVLink 5. NVSwitch extends across nodes.
-- *Infinity Fabric (AMD):* Open, lower bandwidth at scale. Originally AMD CPU on-die interconnect, extended to GPUs.
-- Multi-node training at 256+ GPUs is where interconnect becomes the dominant bottleneck -- NVIDIA's current advantage.
-
-**Rule of thumb for conversations:**
-- **Inference talk?** Focus on bandwidth + memory capacity (AMD strength)
-- **Training at scale?** Focus on interconnect + TFLOPS (NVIDIA advantage, AMD catching up)
-- **Cost/TCO talk?** Focus on TDP + price-per-TFLOPS (AMD advantage)
-
-**Questions to ask based on these specs:**
-- To AMD: "MI355X bandwidth is listed at 6 TB/s vs. B200 at 8 TB/s. Does the extra HBM capacity compensate for the bandwidth gap in practice for large model inference?"
-- To TensorWave: "For inference-heavy workloads, is the 192 GB MI300X still the sweet spot, or should teams wait for MI355X?"
-- To SemiAnalysis: "When you calculate TCO, how much does the 25% power difference between MI355X and B200 matter over a 3-year server lifecycle?"
-- To Credo: "At what cluster scale does Infinity Fabric's bandwidth gap vs. NVLink start to materially hurt training throughput?"
-
----
-
-## Quick Reference: AMD vs. NVIDIA Terminology
-
-| NVIDIA         | AMD Equivalent       |
-|----------------|----------------------|
-| CUDA           | HIP / ROCm          |
-| cuDNN          | MIOpen               |
-| NCCL           | RCCL                 |
-| TensorRT       | MIGraphX             |
-| Nsight Compute | Omniperf / rocprof   |
-| A100/H100/B200 | MI250X/MI300X/MI355X |
-| NVLink         | Infinity Fabric Link |
-| cuBLAS         | rocBLAS              |
-| Triton (NVIDIA)| Triton (AMD backend) |
-
----
-
-## Post-Event
-
-- Write up key takeaways in this folder
-- Note any contacts made and follow up within 48 hours
-- Evaluate if AMD GPUs are worth exploring
+- Write up key takeaways
+- Follow up with contacts within 48 hours
+- Evaluate if AMD GPUs are worth exploring for your workloads
