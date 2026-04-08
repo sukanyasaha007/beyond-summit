@@ -29,6 +29,10 @@
 
 1. **Software ecosystem** -- CUDA has 15+ years of libraries, tools, tutorials, and muscle memory. ROCm is catching up but not there.
 2. **Interconnect at scale** -- NVLink 5 does 1.8 TB/s per GPU. Infinity Fabric has lower bandwidth. Multi-node training at 256+ GPUs is where this gap hurts.
+   - **The problem:** Distributed training requires all GPUs to exchange gradients (all-reduce operation). NVIDIA's NVSwitch intelligently routes this traffic across nodes at near-NVLink speeds. AMD lacks an equivalent switch. Cross-node communication falls back to RoCE (~50-200 Gbps), which is 10x slower than NVLink.
+   - **Real impact:** All-reduce time jumps from ~100ms (NVIDIA) to ~500ms (AMD) at 256+ GPUs. Training iteration time increases ~10-20%.
+   - **AMD's counter:** Larger HBM (288 GB) lets you fit bigger batches per GPU, reducing communication frequency. Single-node training (8 GPUs) is competitive. Inference (where AMD wins) has no all-reduce overhead.
+   - **Bottom line:** Training at 256+ GPU scale favors NVIDIA. Training at single-node or inference favors AMD.
 3. **Compiler/profiler maturity** -- Nsight Compute is polished. Omniperf/rocprof are functional but rougher.
 4. **Custom kernel support** -- Flash-attention, fused operators, and custom CUDA kernels often need manual porting to HIP/AMD.
 
