@@ -58,12 +58,12 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 
 **Questions:**
 - How long does a team take to migrate from NVIDIA cloud to TensorWave?
-- How does **ScalarLM** `[J]` compare to **vLLM** `[J]` on AMD in throughput and latency?
-- When is **MI355X** `[J]` available on TensorWave, and what does it cost vs. MI300X?
+- How does **[ScalarLM](inference_vllm_sglang.md#scalarlm)** compare to **[vLLM](inference_vllm_sglang.md#vllm)** on AMD in throughput and latency?
+- When is **[MI355X](amd_gpus_&_rocm.md#amd-instinct-gpu-lineup)** available on TensorWave, and what does it cost vs. MI300X?
 - Is TensorWave worth it for smaller workloads (embeddings, RAG) or only large training jobs?
-- What comes pre-installed on a fresh node? **ROCm** `[J]` version, containers, drivers?
+- What comes pre-installed on a fresh node? **[ROCm](amd_gpus_&_rocm.md#rocm--amds-software-stack)** version, containers, drivers?
 - What is the best serving stack for mixed workloads (embeddings + LLM generation)?
-- (EDA) Has anyone used your clusters for EDA AI -- fine-tuning on Verilog code or running **VerilogEval** `[J]`?
+- (EDA) Has anyone used your clusters for EDA AI -- fine-tuning on Verilog code or running **[VerilogEval](eda_review.md#verilogevalvgen-benchmarks)**?
 
 ---
 
@@ -73,20 +73,20 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 **Neha Prakriya** (GenAI Training at Scale) -- Focuses on large-scale model training on Instinct GPUs.
 
 **Questions:**
-- What is next for **ROCm** `[J]`? Which CUDA gaps are being closed in 2026?
-- How production-ready is **FP8** `[J]` on **MI355X** `[J]` for training and inference?
-- Is AMD investing in **Triton** `[J]` or building a proprietary compiler?
-- **Flash-attention** `[J]` on MI355X -- native or community port? Benchmarks vs. NVIDIA?
+- What is next for **[ROCm](amd_gpus_&_rocm.md#rocm--amds-software-stack)**? Which CUDA gaps are being closed in 2026?
+- How production-ready is **[FP8](amd_gpus_&_rocm.md#amd-instinct-gpu-lineup)** on **[MI355X](amd_gpus_&_rocm.md#amd-instinct-gpu-lineup)** for training and inference?
+- Is AMD investing in **[Triton](amd_gpus_&_rocm.md#compilers)** or building a proprietary compiler?
+- **[Flash-attention](amd_gpus_&_rocm.md#the-real-pain-points)** on MI355X -- native or community port? Benchmarks vs. NVIDIA?
 - How do embedding model workloads (high throughput, small models) perform on MI355X vs. LLM inference?
-- What is the state of **ROCm** `[J]` support for smaller, specialized models that could run inference in EDA pipelines?
-- NVIDIA published **ChipNeMo** `[J]` and **VerilogEval** `[J]` for chip design AI. Is AMD planning EDA-specific AI, or leaving it to EDA vendors on ROCm?
-- (Indirect EDA) Does AMD's own chip design team run ML training on Instinct GPUs with ROCm? (**Dogfooding** `[J]`)
-- (Indirect EDA) **Coverage closure** `[J]` at AMD's scale is massive. How does the verification team handle it?
+- What is the state of **[ROCm](amd_gpus_&_rocm.md#rocm--amds-software-stack)** support for smaller, specialized models that could run inference in EDA pipelines?
+- NVIDIA published **[ChipNeMo](eda_review.md#chipnemo)** and **[VerilogEval](eda_review.md#verilogevalvgen-benchmarks)** for chip design AI. Is AMD planning EDA-specific AI, or leaving it to EDA vendors on ROCm?
+- (Indirect EDA) Does AMD's own chip design team run ML training on Instinct GPUs with ROCm? (Dogfooding - using own products for internal work)
+- (Indirect EDA) **Coverage closure** (percentage of test conditions covered) at AMD's scale is massive. How does the verification team handle it?
 - (For Neha) When AMD trains models internally, do you use MI300X clusters or still depend on NVIDIA?
-- Why did AMD build ROCm when Triton already provides cross-platform kernel compilation?
-- How does Triton integrate with ROCm for AI/ML workloads, and what are the performance trade-offs?
-- What are AMD's plans for enhancing Triton support in future ROCm versions?
-- Why focus on hipcc instead of Triton, since many CUDA compiler users already know Triton and might find it easier to migrate?
+- Why did AMD build **[ROCm](amd_gpus_&_rocm.md#rocm--amds-software-stack)** when **[Triton](amd_gpus_&_rocm.md#compilers)** already provides cross-platform kernel compilation?
+- How does **[Triton](amd_gpus_&_rocm.md#compilers)** integrate with **[ROCm](amd_gpus_&_rocm.md#rocm--amds-software-stack)** for AI/ML workloads, and what are the performance trade-offs?
+- What are AMD's plans for enhancing **[Triton](amd_gpus_&_rocm.md#compilers)** support in future **[ROCm](amd_gpus_&_rocm.md#rocm--amds-software-stack)** versions?
+- Why focus on **[hipcc](amd_gpus_&_rocm.md#compilers)** instead of **[Triton](amd_gpus_&_rocm.md#compilers)**, since many CUDA compiler users already know Triton and might find it easier to migrate?
 - How does AMD maintain strong relationships with big competitive cloud providers (AWS, Google Cloud) and also fast-paced emerging providers like TensorWave?
 - *Tip:* Talk to AMD engineers in the audience at networking, not just the VPs on stage.
 
@@ -113,7 +113,7 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 **Dylan Patel** (Founder) -- The most-cited independent analyst for GPU economics, supply chain, and chip strategy. His reports move markets.
 
 **Questions:**
-- What are the real **TCO** `[J]` numbers for AMD vs. NVIDIA at scale?
+- What are the real **TCO** (Total Cost of Ownership) numbers for AMD vs. NVIDIA at scale?
 - Where does AMD win (memory, price) and where does it still lose (software, compilers)?
 - Is AMD GPU capacity actually easier to procure than NVIDIA right now?
 - How do custom chips (Google TPU, AWS Trainium) compare to AMD and NVIDIA on TCO?
@@ -125,22 +125,22 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 **Mathias Lechner** (CTO) -- MIT spin-off. Researches liquid neural networks and state-space models as alternatives to transformers.
 
 **Questions:**
-- Do liquid networks run well on AMD GPUs with **ROCm** `[J]`?
+- Do liquid networks run well on AMD GPUs with **[ROCm](amd_gpus_&_rocm.md#rocm--amds-software-stack)**?
 - Are they more memory-efficient for long documents (relevant to reading chip specs)?
-- Can these models run on standard serving tools like **vLLM** `[J]`?
-- Could liquid networks be better than transformers for ingesting long **RTL** `[J]` specs?
+- Can these models run on standard serving tools like **[vLLM](inference_vllm_sglang.md#vllm)**?
+- Could liquid networks be better than transformers for ingesting long **[RTL](eda_review.md)** (Register Transfer Language) specs?
 
 ---
 
 ### ZLUDA -- CUDA-on-AMD Runtime
 
-**Andrzej Janik** (Founder) -- Built **ZLUDA** `[J]`, a drop-in binary compatibility layer that runs CUDA programs on AMD GPUs without recompilation.
+**Andrzej Janik** (Founder) -- Built **[ZLUDA](amd_gpus_&_rocm.md#portability-paths-getting-from-cuda-to-amd)**, a drop-in binary compatibility layer that runs CUDA programs on AMD GPUs without recompilation.
 
 **Questions:**
-- What percentage of CUDA applications work through **ZLUDA** `[J]` today?
-- How much slower is it vs. native **ROCm** `[J]` / **HIP** `[J]`?
+- What percentage of CUDA applications work through **[ZLUDA](portability-paths)** today?
+- How much slower is it vs. native **[ROCm](amd_gpus_&_rocm.md#rocm--amds-software-stack)** / **[HIP](amd_gpus_&_rocm.md#hip-gpu-programming-language)**?
 - Is it production-ready or still experimental?
-- Is ZLUDA a real migration path, or only for prototyping before a full **HIP** `[J]` port?
+- Is ZLUDA a real migration path, or only for prototyping before a full **[HIP](amd_gpus_&_rocm.md#hip-gpu-programming-language)** port?
 
 ---
 
@@ -149,7 +149,7 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 **Mostafa Hagog** (VP Engineering) -- Building Mojo, a new systems language that targets multiple GPU backends from a single codebase.
 
 **Questions:**
-- How does Modular compare to **Triton** `[J]` for writing GPU kernels that target AMD?
+- How does Modular compare to **[Triton](amd_gpus_&_rocm.md#compilers)** for writing GPU kernels that target AMD?
 - Is anyone using Mojo for production custom kernels yet?
 - Can Modular run identical code on NVIDIA and AMD with zero changes?
 - Where does Modular beat stock PyTorch the most?
@@ -158,22 +158,22 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 
 ### Zyphra -- Efficient Language Models
 
-**Quentin Anthony** (VP Engineering) -- Builds the Zamba series: smaller, efficient models (often **MoE** `[J]`) that compete with larger ones.
+**Quentin Anthony** (VP Engineering) -- Builds the Zamba series: smaller, efficient models (often **MoE** - Mixture of Experts) that compete with larger ones.
 
 **Questions:**
 - How was the experience training on AMD? What broke?
-- Do **MoE** `[J]` and hybrid architectures benefit from AMD's larger **HBM** `[J]`?
-- Which distributed training framework works best on AMD -- DeepSpeed, FSDP, or Megatron? How is **RCCL** `[J]` performing?
+- Do **MoE** (Mixture of Experts) and hybrid architectures benefit from AMD's larger **[HBM](amd_gpus_&_rocm.md#amd-instinct-gpu-lineup)**?
+- Which distributed training framework works best on AMD -- DeepSpeed, FSDP, or Megatron? How is **[RCCL](amd_gpus_&_rocm.md#libraries)** performing?
 
 ---
 
 ### Spectral Compute -- SCALE (Compile-Time CUDA→AMD)
 
-**Michael Sondergaard** (CEO) -- Built **SCALE** `[J]`, which recompiles CUDA source code to AMD GPU targets at build time. Compile-time alternative to ZLUDA's runtime approach.
+**Michael Sondergaard** (CEO) -- Built **[SCALE](amd_gpus_&_rocm.md#portability-paths-getting-from-cuda-to-amd)**, which recompiles CUDA source code to AMD GPU targets at build time. Compile-time alternative to ZLUDA's runtime approach.
 
 **Questions:**
-- How does **SCALE** `[J]` differ from **ZLUDA** `[J]` in practice? When would you use one vs. the other?
-- How fast is SCALE-compiled code vs. native **ROCm** `[J]` / **HIP** `[J]`?
+- How does **[SCALE](amd_gpus_&_rocm.md#portability-paths-getting-from-cuda-to-amd)** differ from **[ZLUDA](amd_gpus_&_rocm.md#portability-paths-getting-from-cuda-to-amd)** in practice? When would you use one vs. the other?
+- How fast is SCALE-compiled code vs. native **[ROCm](amd_gpus_&_rocm.md#rocm--amds-software-stack)** / **[HIP](amd_gpus_&_rocm.md#hip-gpu-programming-language)**?
 - Which CUDA libraries does it cover (cuDNN, cuBLAS, etc.)?
 - Is SCALE free or commercial?
 
@@ -195,8 +195,8 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 **Eugene Cheah** (CEO) -- Deploy any HuggingFace model as a serverless endpoint without managing infrastructure.
 
 **Questions:**
-- How stable is **ROCm** `[J]` for running many different model architectures?
-- What **quantization** `[J]` formats work best on AMD for serverless workloads?
+- How stable is **[ROCm](amd_gpus_&_rocm.md#rocm--amds-software-stack)** for running many different model architectures?
+- What **[quantization](inference_vllm_sglang.md#quantization)** formats work best on AMD for serverless workloads?
 - How do you handle less popular models on AMD hardware?
 
 ---
@@ -226,10 +226,10 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 
 ### MLPerf -- Industry AI Benchmarks
 
-**David Kanter** (Founder) -- Created **MLPerf** `[J]`, the industry-standard hardware-neutral AI benchmark suite. The "SPEC" of AI hardware.
+**David Kanter** (Founder) -- Created **[MLPerf](https://mlperf.org/)**, the industry-standard hardware-neutral AI benchmark suite. The "SPEC" of AI hardware.
 
 **Questions:**
-- How are AMD GPUs doing in recent **MLPerf** `[J]` results vs. NVIDIA and Google TPU?
+- How are AMD GPUs doing in recent **[MLPerf](amd_gpus_&_rocm.md)** (industry AI benchmark suite) results vs. NVIDIA and Google TPU?
 - Where does AMD score best and worst?
 - Are more companies submitting AMD results, or is it still mostly NVIDIA?
 
@@ -240,9 +240,9 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 **Bill Brennan** (CEO) -- Makes high-speed cables and optical interconnects for GPU clusters. The physical layer that connects GPUs across racks.
 
 **Questions:**
-- What bandwidth do **MI355X** `[J]` clusters need from interconnects?
-- How does Credo compare to **NVLink** `[J]` for GPU-to-GPU communication at rack scale?
-- At what cluster scale does **Infinity Fabric** `[J]`'s bandwidth gap vs. NVLink materially hurt training?
+- What bandwidth do **[MI355X](amd_gpus_&_rocm.md#amd-instinct-gpu-lineup)** clusters need from interconnects?
+- How does Credo compare to **[NVLink](nvidia_gpus_&_cuda.md)** for GPU-to-GPU communication at rack scale?
+- At what cluster scale does **[Infinity Fabric](amd_gpus_&_rocm.md#interconnect-bandwidth-comparison)**'s bandwidth gap vs. NVLink materially hurt training?
 
 ---
 
@@ -263,7 +263,7 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 **Questions:**
 - How much power are AI datacenters demanding in the Bay Area?
 - How are utilities planning for megawatt-scale GPU clusters?
-- Does the **TDP** `[J]` difference (750W AMD vs. 1,000W NVIDIA) matter at datacenter scale?
+- Does the **[TDP](amd_gpus_&_rocm.md#amd-instinct-gpu-lineup)** (Thermal Design Power) difference (750W AMD vs. 1,000W NVIDIA) matter at datacenter scale?
 
 ---
 
@@ -293,10 +293,10 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 **Eric Hartford** (Founder) -- Open-source fine-tuning leader. Known for "dolphin" and "samantha" model families. Prolific in the HuggingFace community.
 
 **Questions:**
-- How is fine-tuning large models on AMD GPUs with **ROCm** `[J]` in practice?
+- How is fine-tuning large models on AMD GPUs with **[ROCm](amd_gpus_&_rocm.md#rocm--amds-software-stack)** in practice?
 - Which fine-tuning tool works best on AMD -- Axolotl, LLaMA-Factory, or PEFT?
 - What are the biggest pain points for the open-source community on AMD?
-- (EDA) Has anyone tried running **VerilogEval** `[J]` (Verilog code generation benchmark) on AMD hardware?
+- (EDA) Has anyone tried running **[VerilogEval](eda_review.md#verilogevalvgen-benchmarks)** (Verilog code generation benchmark) on AMD hardware?
 
 ---
 
