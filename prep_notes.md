@@ -93,12 +93,16 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 ### Essential AI -- Enterprise AI
 
 **Ashish Vaswani** (CEO) -- Lead author of "Attention Is All You Need," the original transformer paper. Co-invented the architecture that powers every modern LLM.
+**Company Overview:** Essential AI is an open-source AI company focused on accelerating deep learning science and engineering. They build "instruments of intelligence" -- high-quality LLMs and datasets for STEM and code capabilities. Their flagship release is Rnj-1 (base and instruction-tuned models), available on Hugging Face. Mission emphasizes open collaboration to prevent AI progress from being privatized. They publish research on efficient training (e.g., Muon optimizer) and datasets (e.g., Essential-Web v1.0 with 24T tokens).
 
 **Questions:**
 - What comes after transformers? What architectures are gaining real traction?
 - Does Essential AI target AMD GPUs, or only NVIDIA?
 - What do hybrid architectures (transformers + state-space models) look like in production?
 - How does Essential AI approach agentic AI systems -- autonomous agents for enterprise tasks?
+- How does Rnj-1 perform on AMD GPUs with ROCm? Any optimizations for open-source stacks?
+- What's next after Rnj-1 -- larger models, multimodal, or new architectures?
+- How does Essential AI's open-source approach differ from closed companies like OpenAI or Anthropic?
 
 ---
 
