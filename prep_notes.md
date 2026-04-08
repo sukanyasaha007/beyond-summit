@@ -87,7 +87,7 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 - How does Triton integrate with ROCm for AI/ML workloads, and what are the performance trade-offs?
 - What are AMD's plans for enhancing Triton support in future ROCm versions?
 - Why focus on hipcc instead of Triton, since many CUDA compiler users already know Triton and might find it easier to migrate?
-- Why did AMD not acquire TensorWave? Could it jeopardize relationships with big cloud customers (AWS, Google) who buy AMD GPUs but compete in cloud services?
+- How does AMD maintain strong relationships with big cloud providers (AWS, Google Cloud) while also partnering with independent providers like TensorWave?
 - *Tip:* Talk to AMD engineers in the audience at networking, not just the VPs on stage.
 
 ---
