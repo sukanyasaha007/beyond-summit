@@ -33,6 +33,17 @@
    - **Real impact:** All-reduce time jumps from ~100ms (NVIDIA) to ~500ms (AMD) at 256+ GPUs. Training iteration time increases ~10-20%.
    - **AMD's counter:** Larger HBM (288 GB) lets you fit bigger batches per GPU, reducing communication frequency. Single-node training (8 GPUs) is competitive. Inference (where AMD wins) has no all-reduce overhead.
    - **Bottom line:** Training at 256+ GPU scale favors NVIDIA. Training at single-node or inference favors AMD.
+
+### Interconnect Bandwidth Comparison
+
+| Link Type | Bandwidth | Use Case |
+|-----------|-----------|----------|
+| **NVLink 5** (NVIDIA GPU-to-GPU) | 1.8 TB/s | Intra-node, within a switch fabric |
+| **Infinity Fabric** (AMD GPU-to-GPU) | 0.4-1.0 TB/s | Intra-node |
+| **RoCE** (Ethernet-based inter-node) | 50-400 Gbps | Cross-node, between data centers |
+| **Standard Ethernet** (with CPU involvement) | 10-100 Gbps | General network, slow |
+
+**Key insight:** RoCE is the bottleneck for AMD at scale. NVIDIA's NVSwitch keeps training fast even across nodes.
 3. **Compiler/profiler maturity** -- Nsight Compute is polished. Omniperf/rocprof are functional but rougher.
 4. **Custom kernel support** -- Flash-attention, fused operators, and custom CUDA kernels often need manual porting to HIP/AMD.
 
