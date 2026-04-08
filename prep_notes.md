@@ -98,6 +98,7 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 - What comes after transformers? What architectures are gaining real traction?
 - Does Essential AI target AMD GPUs, or only NVIDIA?
 - What do hybrid architectures (transformers + state-space models) look like in production?
+- How does Essential AI approach agentic AI systems -- autonomous agents for enterprise tasks?
 
 ---
 
@@ -213,6 +214,7 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 - Does OpenShift AI support AMD GPUs well?
 - How mature are AMD GPU device plugins for Kubernetes?
 - Are enterprise customers actually running AMD GPU workloads on OpenShift in production?
+- How does Red Hat approach agentic AI in Kubernetes -- e.g., AI-driven orchestration or autonomous scaling?
 
 ---
 
@@ -266,6 +268,7 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 **Questions:**
 - What AI workloads is AT&T running on AMD GPUs?
 - How does a large enterprise evaluate AMD vs. NVIDIA for production?
+- Are there agentic AI applications in telecom network operations -- e.g., autonomous fault detection or optimization?
 
 ---
 
