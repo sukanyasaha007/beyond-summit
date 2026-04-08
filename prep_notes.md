@@ -64,6 +64,7 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 - What comes pre-installed on a fresh node? **ROCm** `[J]` version, containers, drivers?
 - What is the best serving stack for mixed workloads (embeddings + LLM generation)?
 - (EDA) Has anyone used your clusters for EDA AI -- fine-tuning on Verilog code or running **VerilogEval** `[J]`?
+- How does TensorWave compete with big clouds like AWS or Google Cloud, which dominate with NVIDIA GPUs?
 
 ---
 
@@ -335,8 +336,6 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 - [ ] LinkedIn QR code for contact sharing
 - [ ] Notebook for session notes
 - [ ] Review session schedule when published
-- [ ] Breakfast, lunch, snacks, and evening bites are provided
-- [ ] Questions: Based on event details, Q&A appears to be live during sessions (no pre-submission required). Prepare to ask in-person or via audience interaction.
 
 ---
 
