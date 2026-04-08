@@ -82,6 +82,10 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 - (Indirect EDA) Does AMD's own chip design team run ML training on Instinct GPUs with ROCm? (**Dogfooding** `[J]`)
 - (Indirect EDA) **Coverage closure** `[J]` at AMD's scale is massive. How does the verification team handle it?
 - (For Neha) When AMD trains models internally, do you use MI300X clusters or still depend on NVIDIA?
+- Why did AMD build ROCm when Triton already provides cross-platform kernel compilation?
+- How does Triton integrate with ROCm for AI/ML workloads, and what are the performance trade-offs?
+- What are AMD's plans for enhancing Triton support in future ROCm versions?
+- Why focus on hipcc instead of Triton, since many CUDA compiler users already know Triton and might find it easier to migrate?
 - *Tip:* Talk to AMD engineers in the audience at networking, not just the VPs on stage.
 
 ---
