@@ -36,14 +36,14 @@
 
 ### Interconnect Bandwidth Comparison
 
-| Link Type | Bandwidth | Use Case |
+| Link Type | Per-Link BW | Use Case |
 |-----------|-----------|----------|
-| **NVLink 5** (NVIDIA GPU-to-GPU) | 1.8 TB/s | Intra-node, within a switch fabric |
-| **Infinity Fabric** (AMD GPU-to-GPU) | 0.4-1.0 TB/s | Intra-node |
-| **RoCE** (Ethernet-based inter-node) | 50-400 Gbps | Cross-node, between data centers |
+| **NVLink 5** (NVIDIA GPU-to-GPU) | 1.8 TB/s | Intra-node and inter-node (via NVSwitch fabric) |
+| **Infinity Fabric** (AMD GPU-to-GPU) | 0.4-1.0 TB/s | Intra-node only |
+| **RoCE** (Ethernet-based inter-node) | 50-400 Gbps | Cross-node fallback (when no high-speed switch) |
 | **Standard Ethernet** (with CPU involvement) | 10-100 Gbps | General network, slow |
 
-**Key insight:** RoCE is the bottleneck for AMD at scale. NVIDIA's NVSwitch keeps training fast even across nodes.
+**Key insight:** NVSwitch lets NVIDIA route all-reduce traffic efficiently across both intra-node (NVLink) and inter-node paths. AMD has no equivalent switch, so cross-node communication falls back to RoCE. This is the main bottleneck for AMD at 256+ GPU scales.
 3. **Compiler/profiler maturity** -- Nsight Compute is polished. Omniperf/rocprof are functional but rougher.
 4. **Custom kernel support** -- Flash-attention, fused operators, and custom CUDA kernels often need manual porting to HIP/AMD.
 
