@@ -54,6 +54,7 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 **Piotr Tomasik** (President) -- Operations and infrastructure.
 **Greg Diamos** (ScalarLM Architect) -- Previously at NVIDIA and Baidu. Built ScalarLM, TensorWave's inference engine.
 **Ilya Tabakh** (VP Innovation) -- R&D and new product development.
+**Company Background:** TensorWave is an independent startup (not acquired by AMD) focused on providing bare-metal AMD GPU cloud infrastructure. They specialize in MI-Series accelerators (MI300X, MI325X, MI355X) for AI training, inference, and HPC. SOC2 Type II certified, HIPAA compliant, with UEC-ready networking and direct liquid cooling for energy efficiency.
 
 **Questions:**
 - How long does a team take to migrate from NVIDIA cloud to TensorWave?
