@@ -336,6 +336,7 @@ Jargon terms are marked with `[J]` in the speaker questions below. If you see on
 - [ ] Notebook for session notes
 - [ ] Review session schedule when published
 - [ ] Breakfast, lunch, snacks, and evening bites are provided
+- [ ] Questions: Based on event details, Q&A appears to be live during sessions (no pre-submission required). Prepare to ask in-person or via audience interaction.
 
 ---
 
