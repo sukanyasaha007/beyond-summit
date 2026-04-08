@@ -53,11 +53,63 @@
 
 ROCm is AMD's answer to the CUDA toolkit. It includes:
 
-- **HIP** -- GPU programming language. Syntactically almost identical to CUDA. The `hipify` tool auto-converts ~90% of CUDA code to HIP.
-- **Compilers** -- `hipcc` (HIP compiler), plus Triton has an AMD backend.
-- **Libraries** -- rocBLAS (matrix math), MIOpen (deep learning primitives), RCCL (multi-GPU comms), rocFFT, rocSPARSE.
-- **Profiling** -- Omniperf, rocprof. Functional but less polished than NVIDIA Nsight.
-- **Containers/drivers** -- ROCm ships Docker containers with pre-configured environments.
+### HIP (GPU Programming Language)
+
+- AMD's GPU programming language. Syntactically almost identical to CUDA. The `hipify` tool auto-converts ~90% of CUDA code to HIP.
+- **How it works:** You write `.hip` files that look nearly identical to CUDA `.cu` files. The 90% automation handles function name translation, API calls, and syntax. The remaining 10% requires manual fixes for warp-level primitives (`__shfl_sync`), some cuDNN calls that don't have MIOpen equivalents yet, and custom kernel optimizations.
+- **Real impact:** Porting CUDA code to AMD is not a full rewrite. Most of the work is automated, but the last 10% (custom kernels) can be painful and slow.
+
+### Compilers
+
+**hipcc (HIP Compiler):**
+- AMD's equivalent to NVIDIA's `nvcc`. Takes `.hip` source → intermediate representation → AMD GPU machine code.
+- Less mature than `nvcc`. Fewer optimization passes, less stable across versions, more compiler bugs reported.
+- **Real problem:** Compiler bugs are more frequent on AMD than NVIDIA. Ask TensorWave or AMD speakers about this if you get a chance.
+
+**Triton (with AMD backend):**
+- Open-source GPU kernel compiler from OpenAI. You write kernels in Triton (a Python-like DSL), not raw HIP or CUDA.
+- Triton compiles to **either** NVIDIA or AMD backend automatically from the same code.
+- **Why it matters:** It's the escape hatch from CUDA lock-in. Write once, target both GPUs.
+- **Status on AMD:** Works, but less battle-tested than NVIDIA backend. Growing adoption.
+
+### Libraries
+
+These are the fundamental building blocks that frameworks (PyTorch, JAX) call underneath:
+
+| Library | What It Does | AMD Status | Notes |
+|---------|------------|-----------|-------|
+| **rocBLAS** | Matrix multiplication (GEMM) -- foundation of all ML | Mature, competitive | On par with cuBLAS. Production-ready. |
+| **MIOpen** | Convolution, attention, batch norm, activations | Functional, gaps (esp. flash-attention) | Missing some newer ops. This is the weak link. |
+| **RCCL** | Multi-GPU collective communication (all-reduce, all-gather) | Works on small clusters, not optimized at scale | NCCL (NVIDIA) has 10+ years of optimization at 256+ GPU scale. RCCL works at 8-64 GPUs but gaps emerge at 256+ GPUs. |
+| **rocFFT** | Fast Fourier Transform | Mature | Less commonly used in modern ML. Production-ready. |
+| **rocSPARSE** | Sparse matrix operations | Mature | Less commonly used in modern ML. Production-ready. |
+
+**The real story:** rocBLAS and rocSPARSE are great. MIOpen is the weak link (missing flash-attention variants). RCCL works but is not optimized for large-scale distributed training.
+
+### Profiling Tools
+
+Profiling tools let you see what the GPU is actually doing and identify bottlenecks.
+
+**NVIDIA Nsight Compute:**
+- Polished GUI, built-in optimization hints, seamless CUDA integration.
+- Tells you exactly which operations are slow and suggests fixes.
+- **Status:** Mature, production-standard.
+
+**AMD Omniperf & rocprof:**
+- Command-line tools (no fancy GUI). rocprof does basic profiling; Omniperf does deeper hardware counter analysis.
+- Tell you *what's slow* but not always *why* or how to fix it.
+- UX is rougher, fewer optimization hints, less community documentation.
+- **Real impact:** If you hit a performance problem on AMD, profiling is harder. Fewer people have done it, fewer tutorials.
+
+### Containers & Drivers
+
+**Why this matters:** GPU environments are fragile. Wrong driver version = code breaks.
+
+- ROCm ships Docker containers with pre-configured ROCm, rocBLAS, MIOpen, RCCL -- all tested together.
+- Same idea as NVIDIA CUDA containers: pull the image, everything works.
+- **But:** ROCm containers are less polished. Driver compatibility issues are more common across versions.
+- **Real problem:** ROCm driver stability across versions has been a known pain point. Different driver versions sometimes break compatibility with older code.
+- **Pro tip for tomorrow:** Ask AMD or TensorWave: "What ROCm driver version is stable for long-running training jobs?" This reveals production readiness.
 
 ### Library Mapping: NVIDIA → AMD
 
